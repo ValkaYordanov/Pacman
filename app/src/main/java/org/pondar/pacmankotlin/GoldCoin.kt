@@ -1,4 +1,14 @@
 package org.pondar.pacmankotlin
 
 //Here you need to fill out what should be in a GoldCoin and what should the constructor be
-class GoldCoin() {}
+class GoldCoin(var coinx: Int = 0, var coiny: Int = 0, var taken: Boolean=false) {
+
+
+fun setPosition(x : Int,  y : Int)
+{
+    this.coinx = x
+    this.coiny = y
+}
+
+
+}

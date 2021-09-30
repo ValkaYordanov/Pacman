@@ -35,8 +35,8 @@ class GameView : View {
     //drawn whenever we update the screen.
     override fun onDraw(canvas: Canvas) {
         //Here we get the height and weight
-        h = canvas.height
-        w = canvas.width
+        h = height
+        w = width
         //update the size for the canvas to the game.
         game.setSize(h, w)
         Log.d("GAMEVIEW", "h = $h, w = $w")
@@ -51,9 +51,25 @@ class GameView : View {
         val paint = Paint()
         canvas.drawColor(Color.WHITE) //clear entire canvas to white color
 
+
+        for(i in 0..game.coins.size-1)
+        {
+            if(game.coins[i].taken == true)
+            {
+
+            }else {
+                canvas.drawBitmap(
+                    game.coinBitmap,
+                    game.coins[i].coinx.toFloat(),
+                    game.coins[i].coiny.toFloat(),
+                    paint
+                )
+            }
+        }
         //draw the pacman
         canvas.drawBitmap(game.pacBitmap, game.pacx.toFloat(),
-                game.pacy.toFloat(), paint)
+            game.pacy.toFloat(), paint)
+
 
         //TODO loop through the list of goldcoins and draw them here
 

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import org.pondar.pacmankotlin.databinding.ActivityMainBinding
 
@@ -23,22 +24,37 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        //makes sure it always runs in portrait mode
+        //makes sure it always runs in portrait mode - will cost a warning
+        //but this is want we want!
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         Log.d("onCreate","Oncreate called")
 
         game = Game(this,binding.pointsView)
 
         //intialize the game view clas and game class
+
         game.setGameView(binding.gameView)
         binding.gameView.setGame(game)
         game.newGame()
 
+        binding.moveLeft.setOnClickListener {
+            game.movePacmanLeft(30)
+
+        }
         binding.moveRight.setOnClickListener {
-            game.movePacmanRight(10)
+            game.movePacmanRight(30)
+
+        }
+        binding.moveUp.setOnClickListener {
+            game.movePacmanUp(30)
+
+        }
+        binding.moveDown.setOnClickListener {
+            game.movePacmanDown(30)
 
         }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -56,6 +72,8 @@ class MainActivity : AppCompatActivity() {
             return true
         } else if (id == R.id.action_newGame) {
             Toast.makeText(this, "New Game clicked", Toast.LENGTH_LONG).show()
+            game.coins.clear()
+            game.coinsInitialized=false;
             game.newGame()
             return true
         }
