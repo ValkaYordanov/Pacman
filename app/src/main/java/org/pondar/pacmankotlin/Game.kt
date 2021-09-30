@@ -22,6 +22,9 @@ class Game(private var context: Context, view: TextView) {
     private var pointsView: TextView = view
     private var points: Int = 0
 
+    private var running = false
+    var direction = 2
+
     //bitmap of the pacman
     var pacBitmap: Bitmap
     var pacx: Int = 0
