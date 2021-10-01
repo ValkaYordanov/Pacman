@@ -22,8 +22,15 @@ class Game(private var context: Context, view: TextView) {
     private var pointsView: TextView = view
     private var points: Int = 0
 
-    private var running = false
-    var direction = 2
+
+
+    val LEFT = 1
+    val RIGHT = 2
+    val UP = 3
+    val DOWN = 4
+
+    var running = true
+    var direction = RIGHT
 
     //bitmap of the pacman
     var pacBitmap: Bitmap
