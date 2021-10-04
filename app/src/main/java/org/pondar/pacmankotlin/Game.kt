@@ -3,10 +3,8 @@ package org.pondar.pacmankotlin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.Toast.makeText
 import java.lang.Math.pow
 import java.lang.Math.sqrt
 import java.util.ArrayList
@@ -22,7 +20,7 @@ class Game(private var context: Context, view: TextView) {
     private var pointsView: TextView = view
     private var points: Int = 0
 
-
+    var endGame = false
 
     val LEFT = 1
     val RIGHT = 2
@@ -32,25 +30,32 @@ class Game(private var context: Context, view: TextView) {
     var running = true
     var direction = RIGHT
 
-    //bitmap of the pacman
-    var pacBitmap: Bitmap
-    var pacx: Int = 0
-    var pacy: Int = 0
-    var count: Int = 0
-    var coin: GoldCoin = GoldCoin();
-    var coinBitmap: Bitmap
-    val toastA = Toast.makeText(
+    val toastWin = Toast.makeText(
         context,
         "You win the game!",
         Toast.LENGTH_LONG
     )
 
-    //did we initialize the coins?
-    var coinsInitialized = false
+    val toastLost = Toast.makeText(
+        context,
+        "You lost the game!",
+        Toast.LENGTH_LONG
+    )
 
-    //the list of goldcoins - initially empty
+    //bitmap of the pacman
+    var pacBitmap: Bitmap
+    var pacx: Int = 0
+    var pacy: Int = 0
+
+    var count: Int = 0
+
+    var coinBitmap: Bitmap
+    var coinsInitialized = false
     var coins = ArrayList<GoldCoin>()
 
+    var enemyBitmap: Bitmap
+    var enemies = ArrayList<Enemy>()
+    var enemiesInitialized = false
     //a reference to the gameview
     private lateinit var gameView: GameView
     private var h: Int = 0
@@ -61,7 +66,14 @@ class Game(private var context: Context, view: TextView) {
     //it's a good place to initialize our images.
     init {
         pacBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.pacman)
+        pacBitmap = Bitmap.createScaledBitmap(pacBitmap, 120,120,true)
         coinBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin)
+        coinBitmap = Bitmap.createScaledBitmap(coinBitmap, 100,100,true)
+        enemyBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.enemy)
+        enemyBitmap = Bitmap.createScaledBitmap(enemyBitmap, 120,120,true)
+
+
+
     }
 
     fun setGameView(view: GameView) {
@@ -71,29 +83,55 @@ class Game(private var context: Context, view: TextView) {
     //TODO initialize goldcoins also here
     fun initializeGoldcoins() {
 
-        for (i in 0..2)
-            coins.add(GoldCoin((0..850).random(), (0..850).random()))
+        for (i in 0..4)
+            coins.add(GoldCoin((0..850).random(), (0..1000).random()))
 
         coinsInitialized = true
     }
 
+    fun initializeEnemy() {
+        for (i in 0..1)
+            enemies.add(Enemy((0..850).random(), (0..1000).random()))
+
+        enemiesInitialized = true
+
+    }
 
     fun newGame() {
         pacx = 50
-        pacy = 400 //just some starting coordinates - you can change this.
-        //reset the points
-        toastA.cancel()
+        pacy = 400
+        toastWin.cancel()
         count = 0
         coinsInitialized = false
+        enemiesInitialized = false
+        initializeEnemy()
+        initializeGoldcoins()
         points = 0
+        endGame=false
         pointsView.text = "${context.resources.getString(R.string.points)} $points"
         gameView.invalidate() //redraw screen
+
 
     }
 
     fun setSize(h: Int, w: Int) {
         this.h = h
         this.w = w
+    }
+
+    fun moveEnemy(pixels: Int)
+    {
+        for (i in 0..enemies.size - 1) {
+
+            if (enemies[i].enemyx + pixels + 140 < w) {
+                enemies[i].enemyx = enemies[i].enemyx + pixels
+                doCollisionCheckForEnemy()
+                gameView.invalidate()
+            }
+            doCollisionCheckForEnemy()
+            gameView.invalidate()
+        }
+
     }
 
     fun movePacmanRight(pixels: Int) {
@@ -104,6 +142,7 @@ class Game(private var context: Context, view: TextView) {
             gameView.invalidate()
         }
     }
+
 
     fun movePacmanLeft(pixels: Int) {
         //still within our boundaries?
@@ -159,11 +198,40 @@ class Game(private var context: Context, view: TextView) {
             }
 
         }
-        Log.d("GAMEVIEW", "$count ${coins.size}")
+
         if (count == coins.size) {
 
-            toastA.show()
+            toastWin.show()
+            endGame = true
+            running=false
         }
+    }
+
+    fun doCollisionCheckForEnemy() {
+        var distance: Double
+
+        for (i in 0..enemies.size - 1) {
+
+
+            distance = sqrt(
+                pow(
+                    (pacx - enemies[i].enemyx).toDouble(),
+                    2.0
+                ) + Math.pow((pacy - enemies[i].enemyy).toDouble(), 2.0)
+            )
+
+            if (distance < 70.0) {
+
+                toastLost.show()
+                endGame = true
+                running=false
+
+
+            }
+
+        }
+
+
     }
 
 

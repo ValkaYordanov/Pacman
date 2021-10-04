@@ -4,11 +4,6 @@ package org.pondar.pacmankotlin
 class GoldCoin(var coinx: Int = 0, var coiny: Int = 0, var taken: Boolean=false) {
 
 
-fun setPosition(x : Int,  y : Int)
-{
-    this.coinx = x
-    this.coiny = y
-}
 
 
 }

@@ -29,7 +29,11 @@ class GameView : View {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     //In the onDraw we put all our code that should be
     //drawn whenever we update the screen.
@@ -46,18 +50,32 @@ class GameView : View {
         if (!(game.coinsInitialized))
             game.initializeGoldcoins()
 
+        if (!(game.enemiesInitialized))
+            game.initializeEnemy()
 
         //Making a new paint object
         val paint = Paint()
         canvas.drawColor(Color.WHITE) //clear entire canvas to white color
 
+        for (i in 0..game.enemies.size - 1) {
+            if (game.enemies[i].isALive == false) {
 
-        for(i in 0..game.coins.size-1)
-        {
-            if(game.coins[i].taken == true)
-            {
+            } else {
+                canvas.drawBitmap(
+                    game.enemyBitmap,
+                    game.enemies[i].enemyx.toFloat(),
+                    game.enemies[i].enemyy.toFloat(),
+                    paint
+                )
 
-            }else {
+            }
+        }
+
+
+        for (i in 0..game.coins.size - 1) {
+            if (game.coins[i].taken == true) {
+
+            } else {
                 canvas.drawBitmap(
                     game.coinBitmap,
                     game.coins[i].coinx.toFloat(),
@@ -67,15 +85,17 @@ class GameView : View {
             }
         }
         //draw the pacman
-        canvas.drawBitmap(game.pacBitmap, game.pacx.toFloat(),
-            game.pacy.toFloat(), paint)
+        canvas.drawBitmap(
+            game.pacBitmap, game.pacx.toFloat(),
+            game.pacy.toFloat(), paint
+        )
 
-
-        //TODO loop through the list of goldcoins and draw them here
 
 
         game.doCollisionCheck()
+
         super.onDraw(canvas)
+
     }
 
 }
