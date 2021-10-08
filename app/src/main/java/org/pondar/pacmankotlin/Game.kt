@@ -22,6 +22,8 @@ class Game(private var context: Context, view: TextView) {
 
     var endGame = false
 
+    var counterTime=60
+    var level =1
     val LEFT = 1
     val RIGHT = 2
     val UP = 3
@@ -98,18 +100,36 @@ class Game(private var context: Context, view: TextView) {
     }
 
     fun newGame() {
-        pacx = 50
-        pacy = 400
-        toastWin.cancel()
-        count = 0
-        coinsInitialized = false
-        enemiesInitialized = false
-        initializeEnemy()
-        initializeGoldcoins()
-        points = 0
-        endGame=false
-        pointsView.text = "${context.resources.getString(R.string.points)} $points"
-        gameView.invalidate() //redraw screen
+
+        if(!endGame)
+        {
+            count=count
+            points = points
+            enemies=enemies
+            coins=coins
+
+            enemies.add(Enemy((0..850).random(), (0..1000).random()))
+            coins.add(GoldCoin((0..850).random(), (0..1000).random()))
+        }
+        else
+        {
+            count = 0
+            points = 0
+        }
+
+            pacx = 50
+            pacy = 400
+            toastWin.cancel()
+            counterTime = 60
+            coinsInitialized = false
+            enemiesInitialized = false
+            initializeEnemy()
+            initializeGoldcoins()
+            running = true
+
+            endGame = false
+            pointsView.text = "${context.resources.getString(R.string.points)} $points"
+            gameView.invalidate() //redraw screen
 
 
     }
@@ -119,19 +139,66 @@ class Game(private var context: Context, view: TextView) {
         this.w = w
     }
 
-    fun moveEnemy(pixels: Int)
-    {
-        for (i in 0..enemies.size - 1) {
+//    fun moveEnemy(pixels: Int)
+//    {
+//        for (i in 0..enemies.size - 1) {
+//
+//            if (enemies[i].enemyx + pixels + 140 < w) {
+//                enemies[i].enemyx = enemies[i].enemyx + pixels
+//                doCollisionCheckForEnemy()
+//                gameView.invalidate()
+//            }
+//
+//            doCollisionCheckForEnemy()
+//            gameView.invalidate()
+//        }
+//
+//    }
 
+
+    fun moveEnemyRight(pixels: Int) {
+        //still within our boundaries?
+        for (i in 0..enemies.size - 1) {
             if (enemies[i].enemyx + pixels + 140 < w) {
                 enemies[i].enemyx = enemies[i].enemyx + pixels
                 doCollisionCheckForEnemy()
                 gameView.invalidate()
             }
-            doCollisionCheckForEnemy()
-            gameView.invalidate()
         }
+    }
 
+
+    fun moveEnemyLeft(pixels: Int) {
+        //still within our boundaries?
+        for (i in 0..enemies.size - 1) {
+            if (enemies[i].enemyx - pixels + 140 > 0 + enemyBitmap.width) {
+                enemies[i].enemyx = enemies[i].enemyx - pixels
+                doCollisionCheckForEnemy()
+                gameView.invalidate()
+            }
+        }
+    }
+
+    fun moveEnemyUp(pixels: Int) {
+        //still within our boundaries?
+        for (i in 0..enemies.size - 1) {
+            if (enemies[i].enemyy - pixels + 140 > 0 + 140) {
+                enemies[i].enemyy = enemies[i].enemyy - pixels
+                doCollisionCheckForEnemy()
+                gameView.invalidate()
+            }
+        }
+    }
+
+    fun moveEnemyDown(pixels: Int) {
+        //still within our boundaries?
+        for (i in 0..enemies.size - 1) {
+            if (enemies[i].enemyy + pixels + 140 < h) {
+                enemies[i].enemyy = enemies[i].enemyy + pixels
+                doCollisionCheckForEnemy()
+                gameView.invalidate()
+            }
+        }
     }
 
     fun movePacmanRight(pixels: Int) {
@@ -202,8 +269,10 @@ class Game(private var context: Context, view: TextView) {
         if (count == coins.size) {
 
             toastWin.show()
-            endGame = true
+
             running=false
+            level++
+            newGame()
         }
     }
 

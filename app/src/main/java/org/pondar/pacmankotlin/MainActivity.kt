@@ -144,8 +144,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val timer = Runnable {
         if (game.running) {
 
-            countTime--
-            if (countTime == 0) {
+            game.counterTime--
+            if (game.counterTime == 0) {
                 Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
                 game.running = false
                 game.endGame = false
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             //you need TWO counters - one for the timer count down that will
             // run every second and one for the pacman which need to run
             //faster than every second
-            binding.textView.text = getString(R.string.timerValue, countTime)
+            binding.textView.text = getString(R.string.timerValue, game.counterTime)
         }
     }
     private val timerTick = Runnable {
@@ -165,15 +165,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (game.running) {
 
 
-            game.moveEnemy(20)
+            //game.moveEnemyRight(40)
             if (game.direction == game.RIGHT) { // move right
                 game.movePacmanRight(30)
+                game.moveEnemyLeft(40)
             } else if (game.direction == game.LEFT) {
                 game.movePacmanLeft(30)
+                game.moveEnemyRight(40)
             } else if (game.direction == game.UP) {
                 game.movePacmanUp(30)
+                game.moveEnemyDown(40)
             } else if (game.direction == game.DOWN) {
                 game.movePacmanDown(30)
+                game.moveEnemyUp(40)
             }
         }
 
@@ -206,14 +210,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             Toast.makeText(this, "settings clicked", Toast.LENGTH_LONG).show()
             return true
         } else if (id == R.id.action_newGame) {
-            Toast.makeText(this, "New Game clicked", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "New Game clicked", Toast.LENGTH_SHORT).show()
             game.coins.clear()
             game.enemies.clear()
             game.coinsInitialized = false;
             game.direction = game.RIGHT
-            countTime = 60
+            game.counterTime = 60
             game.running = true
-            binding.textView.text = getString(R.string.timerValue, countTime)
+            binding.textView.text = getString(R.string.timerValue, game.counterTime)
+            game.endGame=true
             game.newGame()
 
             return true
