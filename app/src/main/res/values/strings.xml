@@ -7,9 +7,11 @@
     <string name="move_down">Down</string>
     <string name="action_settings">Settings</string>
     <string name="newgame">New Game</string>
-    <string name="hello_world">Timer value: </string>
+    <string name="hello_world">Time: </string>
+    <string name="level">Level: </string>
     <string name="pause">Pause</string>
     <string name="continueLabel">Continue</string>
     <string name="reset">Reset</string>
-    <string name="timerValue">Timer Value: %1$d</string>
+    <string name="timerValue">Time: %1$d</string>
+    <string name="levelValue">Level: %1$d</string>
 </resources>

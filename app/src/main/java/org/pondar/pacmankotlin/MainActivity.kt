@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
 
     /// var counterForPacman: Int = 0
-    var countTime: Int = 60
+    //var countTime: Int = 60
     //constants for directions - define the rest yourself
 
 
@@ -50,14 +50,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 timerMethod()
             }
 
-        }, 0, 200) //0 indicates we start now, 200
+        }, 3000, 200) //0 indicates we start now, 200
         //is the number of miliseconds between each call
         time.schedule(object : TimerTask() {
             override fun run() {
                 time()
             }
 
-        }, 0, 1000)
+        }, 3000, 1000)
 
         binding.startButton.setOnClickListener(this)
         binding.stopButton.setOnClickListener(this)
@@ -96,45 +96,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
-
-        /*binding.moveLeft.setOnClickListener {
-            game.direction = game.LEFT
-
-        }
-        binding.moveRight.setOnClickListener {
-            game.direction = game.RIGHT
-
-        }
-        binding.moveUp.setOnClickListener {
-            game.direction = game.UP
-
-        }
-        binding.moveDown.setOnClickListener {
-            game.direction = game.DOWN
-
-        }*/
     }
 
     override fun onStop() {
         super.onStop()
-        //just to make sure if the app is killed, that we stop the timer.
         pacmanTimer.cancel()
         time.cancel()
     }
 
     private fun timerMethod() {
-        //This method is called directly by the timer
-        //and runs in the same thread as the timer - i.e the background
-
-        //we could do updates here TO GAME LOGIC,
-        // but not updates TO ACTUAL UI
-
-        //We call the method that will work with the UI
-        //through the runOnUiThread method.
-
         this.runOnUiThread(timerTick)
-        //timerTick.run() //try doing this instead of the above...will crash the app!
-
     }
 
     private fun time() {
@@ -148,7 +119,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             if (game.counterTime == 0) {
                 Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
                 game.running = false
-                game.endGame = false
+                game.endGame = true
             }
 
             //update the counter - notice this is NOT seconds in this example
@@ -156,7 +127,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             // run every second and one for the pacman which need to run
             //faster than every second
             binding.textView.text = getString(R.string.timerValue, game.counterTime)
+
         }
+        binding.levelView.text = getString(R.string.levelValue, game.level)
     }
     private val timerTick = Runnable {
         //This method runs in the same thread as the UI.
@@ -207,7 +180,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
         if (id == R.id.action_settings) {
-            Toast.makeText(this, "settings clicked", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "settings clicked", Toast.LENGTH_SHORT).show()
             return true
         } else if (id == R.id.action_newGame) {
             Toast.makeText(this, "New Game clicked", Toast.LENGTH_SHORT).show()
@@ -218,7 +191,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             game.counterTime = 60
             game.running = true
             binding.textView.text = getString(R.string.timerValue, game.counterTime)
-            game.endGame=true
+            binding.levelView.text = getString(R.string.levelValue, game.level)
+            game.endGame = true
             game.newGame()
 
             return true

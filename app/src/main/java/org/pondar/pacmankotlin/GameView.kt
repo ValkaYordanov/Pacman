@@ -13,8 +13,8 @@ import android.view.View
 class GameView : View {
 
     private lateinit var game: Game
-    private var h: Int = 0
-    private var w: Int = 0 //used for storing our height and width of the view
+     public var h: Int = 0
+     public var w: Int = 0 //used for storing our height and width of the view
 
     fun setGame(game: Game) {
         this.game = game
@@ -48,7 +48,7 @@ class GameView : View {
         //are the coins initiazlied?
         //if not initizlise them
         if (!(game.coinsInitialized))
-            game.initializeGoldcoins()
+            game.initializeGoldCoins()
 
         if (!(game.enemiesInitialized))
             game.initializeEnemy()

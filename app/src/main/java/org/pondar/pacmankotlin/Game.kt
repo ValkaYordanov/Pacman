@@ -3,6 +3,7 @@ package org.pondar.pacmankotlin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import java.lang.Math.pow
@@ -22,8 +23,8 @@ class Game(private var context: Context, view: TextView) {
 
     var endGame = false
 
-    var counterTime=60
-    var level =1
+    var counterTime = 60
+    var level = 0
     val LEFT = 1
     val RIGHT = 2
     val UP = 3
@@ -32,11 +33,6 @@ class Game(private var context: Context, view: TextView) {
     var running = true
     var direction = RIGHT
 
-    val toastWin = Toast.makeText(
-        context,
-        "You win the game!",
-        Toast.LENGTH_LONG
-    )
 
     val toastLost = Toast.makeText(
         context,
@@ -58,6 +54,7 @@ class Game(private var context: Context, view: TextView) {
     var enemyBitmap: Bitmap
     var enemies = ArrayList<Enemy>()
     var enemiesInitialized = false
+
     //a reference to the gameview
     private lateinit var gameView: GameView
     private var h: Int = 0
@@ -68,12 +65,11 @@ class Game(private var context: Context, view: TextView) {
     //it's a good place to initialize our images.
     init {
         pacBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.pacman)
-        pacBitmap = Bitmap.createScaledBitmap(pacBitmap, 120,120,true)
+        pacBitmap = Bitmap.createScaledBitmap(pacBitmap, 120, 120, true)
         coinBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin)
-        coinBitmap = Bitmap.createScaledBitmap(coinBitmap, 100,100,true)
+        coinBitmap = Bitmap.createScaledBitmap(coinBitmap, 100, 100, true)
         enemyBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.enemy)
-        enemyBitmap = Bitmap.createScaledBitmap(enemyBitmap, 120,120,true)
-
+        enemyBitmap = Bitmap.createScaledBitmap(enemyBitmap, 120, 120, true)
 
 
     }
@@ -83,77 +79,117 @@ class Game(private var context: Context, view: TextView) {
     }
 
     //TODO initialize goldcoins also here
-    fun initializeGoldcoins() {
+    fun initializeGoldCoins() {
 
-        for (i in 0..4)
-            coins.add(GoldCoin((0..850).random(), (0..1000).random()))
-
+        var maxX = gameView.w - coinBitmap.width * 2
+        var maxY = gameView.h - coinBitmap.height * 2
+        coins.add(
+            GoldCoin(
+                (0 + coinBitmap.width..maxX).random(),
+                (0 + coinBitmap.height..maxY).random()
+            )
+        )
         coinsInitialized = true
     }
 
     fun initializeEnemy() {
-        for (i in 0..1)
-            enemies.add(Enemy((0..850).random(), (0..1000).random()))
+
+        var eX = (0..gameView.w - enemyBitmap.width).random()
+        var eY = (0..gameView.h - enemyBitmap.height).random()
+        var pX = pacx
+        var pY = pacy
+        var distance = distanceBetweenPac(eX, eY, pX, pY)
+
+        while (distance < 350) {
+            eX = (0..gameView.w - enemyBitmap.width).random()
+            eY = (0..gameView.h - enemyBitmap.height).random()
+            distance = distanceBetweenPac(eX, eY, pX, pY)
+        }
+        enemies.add(Enemy(eX, eY))
 
         enemiesInitialized = true
+    }
 
+
+    fun distanceBetweenPac(eX: Int, eY: Int, pX: Int, pY: Int): Double {
+        var distance = sqrt(
+            pow(
+                (eX - pX).toDouble(),
+                2.0
+            ) + Math.pow((eY - pY).toDouble(), 2.0)
+        )
+        return distance
     }
 
     fun newGame() {
+        direction=RIGHT
+        pacx = 50
+        pacy = 400
+        if (!endGame) {
 
-        if(!endGame)
-        {
-            count=count
+            level++
+            val toastWin = Toast.makeText(
+                context,
+                "Level ${level}!",
+                Toast.LENGTH_SHORT
+            )
+            toastWin.show()
+
             points = points
-            enemies=enemies
-            coins=coins
+            for (i in 0..coins.size - 1) {
+                var maxX = gameView.w - coinBitmap.width * 2
+                var maxY = gameView.h - coinBitmap.height * 2
+                coins[i].taken = false
+                coins[i].coinx = (0 + coinBitmap.width..maxX).random()
+                coins[i].coiny = (0 + coinBitmap.height..maxY).random()
 
-            enemies.add(Enemy((0..850).random(), (0..1000).random()))
-            coins.add(GoldCoin((0..850).random(), (0..1000).random()))
-        }
-        else
-        {
-            count = 0
+            }
+            for (i in 0..enemies.size - 1) {
+
+                var eX = (0..gameView.w - enemyBitmap.width).random()
+                var eY = (0..gameView.h - enemyBitmap.height).random()
+                var pX = pacx
+                var pY = pacy
+                var distance = distanceBetweenPac(eX, eY, pX, pY)
+
+
+                while (distance < 350) {
+                    eX = (0..gameView.w - enemyBitmap.width).random()
+                    eY = (0..gameView.h - enemyBitmap.height).random()
+                    distance = distanceBetweenPac(eX, eY, pX, pY)
+                }
+
+                enemies[i].enemyx = eX
+                enemies[i].enemyy = eY
+
+            }
+
+        } else {
             points = 0
+            level = 1
         }
 
-            pacx = 50
-            pacy = 400
-            toastWin.cancel()
-            counterTime = 60
-            coinsInitialized = false
-            enemiesInitialized = false
+
+        count = 0
+
+        coinsInitialized = false
+        enemiesInitialized = false
+        counterTime = 60
+        if (gameView.w != 0 && gameView.h != 0) {
+            initializeGoldCoins()
             initializeEnemy()
-            initializeGoldcoins()
-            running = true
+        }
 
-            endGame = false
-            pointsView.text = "${context.resources.getString(R.string.points)} $points"
-            gameView.invalidate() //redraw screen
-
-
+        running = true
+        endGame = false
+        pointsView.text = "${context.resources.getString(R.string.points)} $points"
+        gameView.invalidate() //redraw screen
     }
 
     fun setSize(h: Int, w: Int) {
         this.h = h
         this.w = w
     }
-
-//    fun moveEnemy(pixels: Int)
-//    {
-//        for (i in 0..enemies.size - 1) {
-//
-//            if (enemies[i].enemyx + pixels + 140 < w) {
-//                enemies[i].enemyx = enemies[i].enemyx + pixels
-//                doCollisionCheckForEnemy()
-//                gameView.invalidate()
-//            }
-//
-//            doCollisionCheckForEnemy()
-//            gameView.invalidate()
-//        }
-//
-//    }
 
 
     fun moveEnemyRight(pixels: Int) {
@@ -245,10 +281,7 @@ class Game(private var context: Context, view: TextView) {
     //check each of them for a collision with the pacman
     fun doCollisionCheck() {
         var distance: Double
-
         for (i in 0..coins.size - 1) {
-
-
             distance = sqrt(
                 pow(
                     (pacx - coins[i].coinx).toDouble(),
@@ -260,42 +293,30 @@ class Game(private var context: Context, view: TextView) {
                 count++
                 points++
                 pointsView.text = "${context.resources.getString(R.string.points)} $points"
-
-
             }
-
         }
-
         if (count == coins.size) {
-
-            toastWin.show()
-
-            running=false
-            level++
+            for (i in 0..coins.size - 1) {
+                coins[i].taken = false
+            }
+            running = false
             newGame()
         }
     }
 
     fun doCollisionCheckForEnemy() {
         var distance: Double
-
         for (i in 0..enemies.size - 1) {
-
-
             distance = sqrt(
                 pow(
                     (pacx - enemies[i].enemyx).toDouble(),
                     2.0
                 ) + Math.pow((pacy - enemies[i].enemyy).toDouble(), 2.0)
             )
-
             if (distance < 70.0) {
-
                 toastLost.show()
                 endGame = true
-                running=false
-
-
+                running = false
             }
 
         }
