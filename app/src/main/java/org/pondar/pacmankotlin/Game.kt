@@ -99,7 +99,6 @@ class Game(private var context: Context, view: TextView) {
         var pX = pacx
         var pY = pacy
         var distance = distanceBetweenPac(eX, eY, pX, pY)
-
         while (distance < 350) {
             eX = (0..gameView.w - enemyBitmap.width).random()
             eY = (0..gameView.h - enemyBitmap.height).random()
@@ -318,10 +317,7 @@ class Game(private var context: Context, view: TextView) {
                 endGame = true
                 running = false
             }
-
         }
-
-
     }
 
 
